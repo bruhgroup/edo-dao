@@ -11,6 +11,7 @@ contract EDAO is EDOKEN {
     event PROPOSAL_SUBMITTED(uint indexed index, address author, string description);
     event PROPOSAL_VOTED(uint indexed index, uint8 numVotes, bool support);
 
+    // Costs 10 tokens to submit a proposal.
     uint8 immutable ProposalCost = 10;
 
     struct Proposal {
@@ -20,6 +21,7 @@ contract EDAO is EDOKEN {
         mapping(address=>uint8) timesVoted;
     }
 
+    // Holds all proposals.
     Proposal[] public proposals;
 
     modifier onlyEDO() {
@@ -35,17 +37,16 @@ contract EDAO is EDOKEN {
         _;
     }
 
-    constructor(uint _initialSupply) EDOKEN() {
-        // Mints a fixed supply of governence tokens.
-        _mint(address(this), _initialSupply);
+    constructor() EDOKEN() {
+        // Edo is the contract creator.
         EDO = msg.sender;
     }
 
     /**
-     * awardTokens allows Edo to award governance tokens to students.
+     * awardTokens allows ONLY Edo to award governance tokens to students.
      */
     function awardTokens(address student, uint256 amount) public onlyEDO {
-        // This should transfer from Edo's wallet to yours.
+        // Mints a number of tokens to the student.
         _mint(student, amount);
 
         emit AWARDED_TOKENS(student, amount);
