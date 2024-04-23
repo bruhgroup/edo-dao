@@ -5,7 +5,7 @@ import "contracts/CLASSKEN.sol";
 
 contract CLASSDAO is CLASSKEN {
 
-    address private immutable PROFESSOR;
+    address public immutable PROFESSOR;
 
     event AWARDED_TOKENS(address student, uint amount);
     event PROPOSAL_SUBMITTED(uint indexed index, address author, string description);
@@ -22,7 +22,7 @@ contract CLASSDAO is CLASSKEN {
     }
 
     // Holds all proposals.
-    Proposal[] public proposals;
+    Proposal[] public PROPOSALS;
 
     /**
      * To make certain methods professor-only
@@ -61,10 +61,10 @@ contract CLASSDAO is CLASSKEN {
     function submitProposal(string memory description) public notProfessor {
         _burn(msg.sender, PROPOSAL_COST);
 
-        Proposal storage newProposal = proposals.push();
+        Proposal storage newProposal = PROPOSALS.push();
         newProposal.description = description;
 
-        emit PROPOSAL_SUBMITTED(proposals.length - 1, msg.sender, description);
+        emit PROPOSAL_SUBMITTED(PROPOSALS.length - 1, msg.sender, description);
     }
    
     /**
@@ -73,19 +73,19 @@ contract CLASSDAO is CLASSKEN {
      *  i.e. first vote costs 1, second costs 2, ... n^2
      */
      function voteProposal(uint proposalIndex, uint8 numVotes, bool support) public notProfessor {
-        require(proposalIndex < proposals.length);
+        require(proposalIndex < PROPOSALS.length);
         
-        uint8 previousVotes = proposals[proposalIndex].timesAddressVoted[msg.sender];
+        uint8 previousVotes = PROPOSALS[proposalIndex].timesAddressVoted[msg.sender];
         uint voteCost = (previousVotes + numVotes)^2 - previousVotes^2;
 
         _burn(msg.sender, voteCost);
         if (support) {
-            proposals[proposalIndex].votesFor += numVotes;
+            PROPOSALS[proposalIndex].votesFor += numVotes;
         } else {
-            proposals[proposalIndex].votesAgainst += numVotes;
+            PROPOSALS[proposalIndex].votesAgainst += numVotes;
         }
 
-        proposals[proposalIndex].timesAddressVoted[msg.sender] += numVotes;
+        PROPOSALS[proposalIndex].timesAddressVoted[msg.sender] += numVotes;
 
         emit PROPOSAL_VOTED(proposalIndex, numVotes, support);
     }

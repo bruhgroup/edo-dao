@@ -6,7 +6,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { type State, WagmiProvider } from "wagmi";
-import { config, projectId } from "@/lib/config";
+import { wagmiConfig, projectId } from "@/lib/wagmiConfig";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 
 type Props = {
@@ -20,13 +20,13 @@ if (!projectId) throw new Error("Project ID is not defined");
 
 // Create modal
 createWeb3Modal({
-  wagmiConfig: config,
+  wagmiConfig: wagmiConfig,
   projectId,
 });
 
 export function WalletConnectProvider({ children, initialState }: Props) {
   return (
-    <WagmiProvider config={config} initialState={initialState}>
+    <WagmiProvider config={wagmiConfig} initialState={initialState}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
