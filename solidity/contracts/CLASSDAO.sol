@@ -15,6 +15,7 @@ contract CLASSDAO is CLASSKEN {
     uint8 public immutable PROPOSAL_COST = 10;
 
     struct Proposal {
+        string title;
         string description;
         uint256 votesFor;
         uint256 votesAgainst;
@@ -46,6 +47,13 @@ contract CLASSDAO is CLASSKEN {
     }
 
     /**
+     * totalProposals returns the total number of proposals submitted.
+     */
+    function totalProposals() public view returns (uint256) {
+        return PROPOSALS.length;
+    }
+
+    /**
      * awardTokens allows ONLY professor to award governance tokens to students.
      */
     function awardTokens(address student, uint256 amount) public onlyProfessor {
@@ -58,10 +66,11 @@ contract CLASSDAO is CLASSKEN {
     /**
      * submitProposal allows a student to submit an PIP (Professor Improvement Proposal).
      */
-    function submitProposal(string memory description) public notProfessor {
+    function submitProposal(string memory title, string memory description) public notProfessor {
         _burn(msg.sender, PROPOSAL_COST);
 
         Proposal storage newProposal = PROPOSALS.push();
+        newProposal.title = title;
         newProposal.description = description;
 
         emit PROPOSAL_SUBMITTED(PROPOSALS.length - 1, msg.sender, description);

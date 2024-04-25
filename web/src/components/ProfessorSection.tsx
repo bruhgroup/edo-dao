@@ -1,7 +1,6 @@
 "use client";
 
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
-import { classdaoAbi } from "@/lib/abi/CLASSDAO.abi";
+import { useWriteContract } from "wagmi";
 import {
   Form,
   FormControl,
@@ -17,20 +16,22 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
+import { contractConfig } from "@/lib/wagmiConfig";
+import type { eth_address } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FormSchema = z.object({
   student: z.string().startsWith("0x").min(8),
   amount: z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
 });
 
-export function ProfessorSection() {
-  const { address } = useAccount();
-  const { data: professorAddress } = useReadContract({
-    abi: classdaoAbi,
-    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-    functionName: "PROFESSOR",
-  });
-
+export function ProfessorSection({
+  address,
+  professorAddress,
+}: {
+  address: eth_address;
+  professorAddress: eth_address;
+}) {
   const { data: hash, writeContract } = useWriteContract();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -51,8 +52,7 @@ export function ProfessorSection() {
     });
 
     writeContract({
-      address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      abi: classdaoAbi,
+      ...contractConfig,
       functionName: "awardTokens",
       args: [data.student, BigInt(data.amount)],
     });
@@ -88,7 +88,7 @@ export function ProfessorSection() {
                   <FormMessage />
                 </FormItem>
               )}
-            />{" "}
+            />
             <FormField
               control={form.control}
               name="amount"
@@ -122,7 +122,11 @@ export function ProfessorSection() {
   return (
     <>
       <h1 className={"text-2xl text-center"}>Your Professor</h1>
-      <p>{professorAddress ?? "N/A"}</p>
+      {professorAddress ? (
+        <p>{professorAddress}</p>
+      ) : (
+        <Skeleton className={"w-1/2 h-[20px]"} />
+      )}
     </>
   );
 }

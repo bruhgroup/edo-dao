@@ -339,6 +339,11 @@ export const classdaoAbi = [
     outputs: [
       {
         internalType: "string",
+        name: "title",
+        type: "string",
+      },
+      {
+        internalType: "string",
         name: "description",
         type: "string",
       },
@@ -589,6 +594,11 @@ export const classdaoAbi = [
     inputs: [
       {
         internalType: "string",
+        name: "title",
+        type: "string",
+      },
+      {
+        internalType: "string",
         name: "description",
         type: "string",
       },
@@ -606,6 +616,19 @@ export const classdaoAbi = [
         internalType: "string",
         name: "",
         type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalProposals",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

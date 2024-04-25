@@ -27,7 +27,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn("bg-slate-600", inter.className)}>
+      <body className={cn("bg-muted-foreground", inter.className)}>
         <WalletConnectProvider initialState={initialState}>
           <div className={"container p-5"}>{children}</div>
         </WalletConnectProvider>

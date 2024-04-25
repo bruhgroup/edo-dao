@@ -20,9 +20,8 @@ import { classdaoAbi } from "@/lib/abi/CLASSDAO.abi";
 import { useWriteContract } from "wagmi";
 
 const FormSchema = z.object({
-  description: z.string().min(8, {
-    message: "Description must be at least 8 characters.",
-  }),
+  title: z.string().min(8),
+  description: z.string().min(8),
 });
 
 export function SubmitProposal() {
@@ -32,6 +31,7 @@ export function SubmitProposal() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      title: "",
       description: "",
     },
   });
@@ -50,13 +50,33 @@ export function SubmitProposal() {
       address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
       abi: classdaoAbi,
       functionName: "submitProposal",
-      args: [data.description],
+      args: [data.title, data.description],
     });
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input
+                  className="text-black"
+                  placeholder="Add a title"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                A description of what you want this proposal to achieve.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="description"
@@ -66,7 +86,7 @@ export function SubmitProposal() {
               <FormControl>
                 <Input
                   className="text-black"
-                  placeholder="Weekly pizza parties"
+                  placeholder="Add a description"
                   {...field}
                 />
               </FormControl>

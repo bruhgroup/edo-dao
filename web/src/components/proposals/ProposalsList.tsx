@@ -1,7 +1,6 @@
 "use client";
 
-import { useReadContract } from "wagmi";
-import { classdaoAbi } from "@/lib/abi/CLASSDAO.abi";
+import { useInfiniteReadContracts, useReadContract } from "wagmi";
 import {
   Table,
   TableBody,
@@ -11,36 +10,65 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Link from "next/link";
+import { contractConfig } from "@/lib/wagmiConfig";
+import { hash } from "ohash";
 
 export function ProposalsList() {
   // TODO: https://wagmi.sh/react/api/hooks/useInfiniteReadContracts
-  // TODO: A method to get length of proposals, then we need to go through each key.
-  // TODO: A method to get the creator of the proposal.
 
-  const { data } = useReadContract({
-    abi: classdaoAbi,
-    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-    functionName: "PROPOSALS",
-    args: [0],
+  const proposalsPerPage = 5;
+
+  // const { data: totalProposals } = useReadContract({
+  //   ...contractConfig,
+  //   functionName: "totalProposals",
+  // });
+
+  const proposals = useInfiniteReadContracts({
+    cacheKey: "proposals-list",
+    contracts(pageParam) {
+      return [...new Array(proposalsPerPage)].map(
+        (_, i) =>
+          ({
+            ...contractConfig,
+            functionName: "PROPOSALS",
+            args: [BigInt(pageParam + i)],
+          }) as const,
+      );
+    },
+    query: {
+      initialPageParam: 0,
+      getNextPageParam(_lastPage, _allPages, lastPageParam) {
+        return lastPageParam + proposalsPerPage;
+      },
+    },
   });
+
+  if (proposals.isLoading) return <>Loading...</>;
 
   return (
     <Table>
       <TableCaption>A list of recent proposals.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="">Proposal</TableHead>
+          <TableHead className="">Title</TableHead>
+          <TableHead className="">Description</TableHead>
           <TableHead className="">Votes For</TableHead>
           <TableHead className="">Votes Against</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow>
-          <TableCell>{data[0]}</TableCell>
-          <TableCell>{Number(data[1])}</TableCell>
-          <TableCell>{Number(data[2])}</TableCell>
-        </TableRow>
+        {// @ts-ignore
+        proposals.data?.pages
+          .flatMap((p: any[]) => p)
+          .filter((p: Record<string, any>) => p.status == "success")
+          .map((p: Record<string, any>, pi: number) => (
+            <TableRow key={pi}>
+              {p.result.map((r: any, ri: number) => {
+                if (typeof r == "bigint") r = Number(r);
+                return <TableCell key={hash(r + ri)}>{r}</TableCell>;
+              })}
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
   );
