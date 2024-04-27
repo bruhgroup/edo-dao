@@ -28,38 +28,21 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { toast } from "@/components/ui/use-toast";
+import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 
-export function ProposalsList() {
+export function ProposalsList({
+  proposals,
+}: {
+  proposals: InfiniteQueryObserverResult;
+}) {
   // TODO: https://wagmi.sh/react/api/hooks/useInfiniteReadContracts
 
   const { data: txnhash, writeContractAsync } = useWriteContract();
-
-  const proposalsPerPage = 5;
 
   // const { data: totalProposals } = useReadContract({
   //   ...contractConfig,
   //   functionName: "totalProposals",
   // });
-
-  const proposals = useInfiniteReadContracts({
-    cacheKey: "proposals-list",
-    contracts(pageParam) {
-      return [...new Array(proposalsPerPage)].map(
-        (_, i) =>
-          ({
-            ...contractConfig,
-            functionName: "PROPOSALS",
-            args: [BigInt(pageParam + i)],
-          }) as const,
-      );
-    },
-    query: {
-      initialPageParam: 0,
-      getNextPageParam(_lastPage, _allPages, lastPageParam) {
-        return lastPageParam + proposalsPerPage;
-      },
-    },
-  });
 
   if (proposals.isLoading) return <>Loading...</>;
 
@@ -72,22 +55,16 @@ export function ProposalsList() {
     amount: number;
     vote: boolean;
   }) {
-    toast({
-      title: "Voted for a proposal!",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            You have voted {vote ? "FOR" : "AGAINST"} proposal #{index}
-          </code>
-        </pre>
-      ),
-    });
-
     writeContractAsync({
       ...contractConfig,
       functionName: "voteProposal",
       args: [BigInt(index), BigInt(amount), vote],
-    }).then(() => proposals.refetch());
+    }).then(() => {
+      proposals.refetch();
+      toast({
+        title: `You have voted ${vote ? "FOR" : "AGAINST"} proposal #${index}`,
+      });
+    });
   }
 
   return (

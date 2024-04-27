@@ -18,15 +18,23 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { classdaoAbi } from "@/lib/abi/CLASSDAO.abi";
 import { useWriteContract } from "wagmi";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 
 const FormSchema = z.object({
   title: z.string().min(8),
   description: z.string().min(8),
 });
 
-export function SubmitProposal() {
+export function SubmitProposal({
+  proposals,
+}: {
+  proposals: InfiniteQueryObserverResult;
+}) {
   // TODO: https://wagmi.sh/react/guides/write-to-contract
-  const { data: hash, writeContract } = useWriteContract();
+  const { data: hash, writeContractAsync } = useWriteContract();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -37,25 +45,22 @@ export function SubmitProposal() {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "Submitted a new proposal!",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            You may need to refresh the page to see the new proposal.
-          </code>
-        </pre>
-      ),
-    });
+    setLoading(true);
 
-    writeContract({
+    writeContractAsync({
       address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
       abi: classdaoAbi,
       functionName: "submitProposal",
       args: [data.title, data.description],
-    });
+    }).then(() => {
+      toast({
+        title: "Submitted a new proposal!",
+      });
 
-    form.reset();
+      setLoading(false);
+      proposals.refetch();
+      form.reset();
+    });
   }
 
   return (
@@ -101,7 +106,9 @@ export function SubmitProposal() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? <Skeleton>Submit</Skeleton> : "Submit"}
+        </Button>
         {hash && <div>Transaction Hash: {hash}</div>}
       </form>
     </Form>

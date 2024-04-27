@@ -44,11 +44,7 @@ export function ProfessorSection({
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
       title: `Awarded student with ${data.amount} tokens.`,
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">To: ${data.student}</code>
-        </pre>
-      ),
+      description: `Student: ${data.student}`,
     });
 
     writeContract({

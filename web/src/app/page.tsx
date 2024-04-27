@@ -8,6 +8,7 @@ import { useAccount, useReadContracts } from "wagmi";
 import { contractConfig } from "@/lib/wagmiConfig";
 import { useEffect, useState } from "react";
 import { eth_address } from "@/lib/types";
+import { Proposals } from "@/components/proposals/Proposals";
 
 export default function Home() {
   const { address } = useAccount();
@@ -55,10 +56,7 @@ export default function Home() {
           <h1 className={"text-white text-2xl"}>
             Professor Improvement Proposals (PIPs)
           </h1>
-          <ProposalsList />
-          {address && professorAddress && address !== professorAddress && (
-            <SubmitProposal />
-          )}
+          <Proposals address={address} professorAddress={professorAddress} />
         </div>
       </div>
       <div className={"p-5 bg-slate-800 rounded-2xl flex justify-center"}>
