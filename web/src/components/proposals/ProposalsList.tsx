@@ -1,6 +1,10 @@
 "use client";
 
-import { useInfiniteReadContracts, useReadContract } from "wagmi";
+import {
+  useInfiniteReadContracts,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
 import {
   Table,
   TableBody,
@@ -23,9 +27,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { toast } from "@/components/ui/use-toast";
 
 export function ProposalsList() {
   // TODO: https://wagmi.sh/react/api/hooks/useInfiniteReadContracts
+
+  const { data: txnhash, writeContractAsync } = useWriteContract();
 
   const proposalsPerPage = 5;
 
@@ -56,6 +63,33 @@ export function ProposalsList() {
 
   if (proposals.isLoading) return <>Loading...</>;
 
+  function onClick({
+    index,
+    amount,
+    vote,
+  }: {
+    index: number;
+    amount: number;
+    vote: boolean;
+  }) {
+    toast({
+      title: "Voted for a proposal!",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">
+            You have voted {vote ? "FOR" : "AGAINST"} proposal #{index}
+          </code>
+        </pre>
+      ),
+    });
+
+    writeContractAsync({
+      ...contractConfig,
+      functionName: "voteProposal",
+      args: [BigInt(index), BigInt(amount), vote],
+    }).then(() => proposals.refetch());
+  }
+
   return (
     <Table>
       <TableCaption>A list of recent proposals.</TableCaption>
@@ -76,18 +110,30 @@ export function ProposalsList() {
           .filter((p: Record<string, any>) => p.status == "success")
           .map((p: Record<string, any>, pi: number) => (
             <TableRow key={pi}>
-              {p.result.map((r: any, ri: number) => {
-                if (typeof r == "bigint") r = Number(r);
-                return <TableCell key={hash(r + ri)}>{r}</TableCell>;
-              })}
+              <TableCell key={hash(pi + "title")}>{p.result[0]}</TableCell>
+              <TableCell key={hash(pi + "desc")}>{p.result[1]}</TableCell>
+              <TableCell key={hash(pi + "for")}>
+                {Number(p.result[2]) ?? 0}
+              </TableCell>
+              <TableCell key={hash(pi + "against")}>
+                {Number(p.result[3]) ?? 0}
+              </TableCell>
               <TableCell
                 key={hash(pi + "vote")}
                 className={"flex flex-row gap-1"}
               >
-                <Button variant={"ghost"} size={"icon"}>
+                <Button
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={() => onClick({ index: pi, amount: 1, vote: true })}
+                >
                   <ArrowUpIcon />
                 </Button>
-                <Button variant={"ghost"} size={"icon"}>
+                <Button
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={() => onClick({ index: pi, amount: 1, vote: false })}
+                >
                   <ArrowDownIcon />
                 </Button>
               </TableCell>
