@@ -7,9 +7,9 @@ contract CLASSDAO is CLASSKEN {
 
     address public immutable PROFESSOR;
 
-    event AWARDED_TOKENS(address student, uint amount);
-    event PROPOSAL_SUBMITTED(uint indexed index, address author, string description);
-    event PROPOSAL_VOTED(uint indexed index, uint8 numVotes, bool support);
+    event AWARDED_TOKENS(address student, uint256 amount);
+    event PROPOSAL_SUBMITTED(uint256 indexed index, address author, string title, string description);
+    event PROPOSAL_VOTED(uint256 indexed index, uint256 numVotes, bool support);
 
     // Costs 10 tokens to submit a proposal.
     uint8 public immutable PROPOSAL_COST = 10;
@@ -19,7 +19,7 @@ contract CLASSDAO is CLASSKEN {
         string description;
         uint256 votesFor;
         uint256 votesAgainst;
-        mapping(address=>uint8) timesAddressVoted;
+        mapping(address => uint256) timesAddressVoted;
     }
 
     // Holds all proposals.
@@ -73,19 +73,19 @@ contract CLASSDAO is CLASSKEN {
         newProposal.title = title;
         newProposal.description = description;
 
-        emit PROPOSAL_SUBMITTED(PROPOSALS.length - 1, msg.sender, description);
+        emit PROPOSAL_SUBMITTED(PROPOSALS.length - 1, msg.sender, title, description);
     }
-   
+
     /**
      * voteProposal allows a student to vote for a proposal.
      * Multiple votes are allowed, but will have quadratic scaling per vote.
      *  i.e. first vote costs 1, second costs 2, ... n^2
      */
-     function voteProposal(uint proposalIndex, uint8 numVotes, bool support) public notProfessor {
+    function voteProposal(uint256 proposalIndex, uint256 numVotes, bool support) public notProfessor {
         require(proposalIndex < PROPOSALS.length);
-        
-        uint8 previousVotes = PROPOSALS[proposalIndex].timesAddressVoted[msg.sender];
-        uint voteCost = (previousVotes + numVotes)^2 - previousVotes^2;
+
+        uint256 previousVotes = PROPOSALS[proposalIndex].timesAddressVoted[msg.sender];
+        uint256 voteCost = (previousVotes + numVotes) ** 2 - previousVotes ** 2;
 
         _burn(msg.sender, voteCost);
         if (support) {

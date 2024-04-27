@@ -244,6 +244,12 @@ export const classdaoAbi = [
       {
         indexed: false,
         internalType: "string",
+        name: "title",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
         name: "description",
         type: "string",
       },
@@ -262,9 +268,9 @@ export const classdaoAbi = [
       },
       {
         indexed: false,
-        internalType: "uint8",
+        internalType: "uint256",
         name: "numVotes",
-        type: "uint8",
+        type: "uint256",
       },
       {
         indexed: false,
@@ -708,9 +714,9 @@ export const classdaoAbi = [
         type: "uint256",
       },
       {
-        internalType: "uint8",
+        internalType: "uint256",
         name: "numVotes",
-        type: "uint8",
+        type: "uint256",
       },
       {
         internalType: "bool",
