@@ -38,10 +38,12 @@ export function SubmitProposal() {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
-      title: "You submitted the following values:",
+      title: "Submitted a new proposal!",
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          <code className="text-white">
+            You may need to refresh the page to see the new proposal.
+          </code>
         </pre>
       ),
     });
@@ -52,6 +54,8 @@ export function SubmitProposal() {
       functionName: "submitProposal",
       args: [data.title, data.description],
     });
+
+    form.reset();
   }
 
   return (

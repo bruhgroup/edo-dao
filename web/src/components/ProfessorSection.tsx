@@ -43,10 +43,10 @@ export function ProfessorSection({
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
-      title: "You submitted the following values:",
+      title: `Awarded student with ${data.amount} tokens.`,
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          <code className="text-white">To: ${data.student}</code>
         </pre>
       ),
     });
@@ -56,6 +56,8 @@ export function ProfessorSection({
       functionName: "awardTokens",
       args: [data.student, BigInt(data.amount)],
     });
+
+    form.reset();
   }
 
   if (address == professorAddress) {

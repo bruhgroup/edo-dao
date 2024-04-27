@@ -26,7 +26,7 @@ const BarGraph: React.FC<BarGraphProps> = ({ labels, data }) => {
             labels: labels,
             datasets: [
               {
-                label: "Data",
+                label: "Votes",
                 data: data,
                 backgroundColor: [
                   "rgba(75, 192, 192, 0.2)",

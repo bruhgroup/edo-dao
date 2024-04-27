@@ -12,6 +12,17 @@ import {
 } from "@/components/ui/table";
 import { contractConfig } from "@/lib/wagmiConfig";
 import { hash } from "ohash";
+import { ArrowDownIcon, ArrowUpIcon, PieChartIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import BarGraph from "@/components/BarGraph";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 export function ProposalsList() {
   // TODO: https://wagmi.sh/react/api/hooks/useInfiniteReadContracts
@@ -50,10 +61,12 @@ export function ProposalsList() {
       <TableCaption>A list of recent proposals.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="">Title</TableHead>
-          <TableHead className="">Description</TableHead>
-          <TableHead className="">Votes For</TableHead>
-          <TableHead className="">Votes Against</TableHead>
+          <TableHead className={"w-[250px]"}>Title</TableHead>
+          <TableHead className={"w-[750px]"}>Description</TableHead>
+          <TableHead>For</TableHead>
+          <TableHead>Against</TableHead>
+          <TableHead>Vote</TableHead>
+          <TableHead>Chart</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -67,6 +80,43 @@ export function ProposalsList() {
                 if (typeof r == "bigint") r = Number(r);
                 return <TableCell key={hash(r + ri)}>{r}</TableCell>;
               })}
+              <TableCell
+                key={hash(pi + "vote")}
+                className={"flex flex-row gap-1"}
+              >
+                <Button variant={"ghost"} size={"icon"}>
+                  <ArrowUpIcon />
+                </Button>
+                <Button variant={"ghost"} size={"icon"}>
+                  <ArrowDownIcon />
+                </Button>
+              </TableCell>
+              <TableCell key={hash(pi + "chart")}>
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant={"ghost"} size={"icon"}>
+                      <PieChartIcon />
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="mx-auto w-full">
+                      <DrawerHeader className={"justify-items-center gap-3"}>
+                        <DrawerTitle>{p.result[0]}</DrawerTitle>
+                        <DrawerDescription>{p.result[1]}</DrawerDescription>
+                      </DrawerHeader>
+                      <div className="p-5">
+                        <BarGraph
+                          labels={["Votes For", "Votes Against"]}
+                          data={[
+                            Number(p.result[2]) ?? 0,
+                            Number(p.result[3]) ?? 0,
+                          ]}
+                        />
+                      </div>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </TableCell>
             </TableRow>
           ))}
       </TableBody>
