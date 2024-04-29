@@ -1,31 +1,21 @@
 pragma circom 2.0.0;
 
+include "../node_modules/circomlib/circuits/poseidon.circom";
+
 /*
- * This circuit template checks that c is the multiplication of a and b.
- *
- * Generate witness:
- * circom isstudent.circom --r1cs --wasm --sym
+ * This circuit template checks whether the challenger is a student or not.
+ * Challenger provides 4 numbers, and these numbers should match the hash.
  */
 
 template IsStudent () {
+   signal input in[4];
+   signal output out[5];
 
-   // Declaration of signals.
-   signal input a;
-   signal input b;
-   signal output c;
+   component poseidon = PoseidonEx(4, 5);
+   poseidon.initialState <== 0;
 
-   signal ab;
- 
-   // Constraints.
-   ab <== a * b;
-   c <== ab * ab;
+   poseidon.inputs <== in;
+   out <== poseidon.out;
 }
 
 component main = IsStudent();
-
-/* 
-proof.input =  { 
-   "a":4,
-   "b":5
-   }
-*/
