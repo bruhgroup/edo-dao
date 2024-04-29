@@ -22,7 +22,7 @@ export function Proposals({
         (_, i) =>
           ({
             ...contractConfig,
-            functionName: "PROPOSALS",
+            functionName: "proposals",
             args: [BigInt(pageParam + i)],
           }) as const,
       );

@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useInfiniteReadContracts,
-  useReadContract,
-  useWriteContract,
-} from "wagmi";
+import { useWriteContract } from "wagmi";
 import {
   Table,
   TableBody,

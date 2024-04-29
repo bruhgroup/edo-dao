@@ -15,7 +15,7 @@ export default function Home() {
 
   const { data } = useReadContracts({
     contracts: [
-      { ...contractConfig, functionName: "PROFESSOR" },
+      { ...contractConfig, functionName: "professor" },
       { ...contractConfig, functionName: "balanceOf", args: [address!] },
     ],
   });
