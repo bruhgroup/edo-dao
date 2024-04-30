@@ -17,21 +17,34 @@ export default function Home() {
       { ...contractConfig, functionName: "professor" },
       { ...contractConfig, functionName: "balanceOf", args: [address!] },
       { ...contractConfig, functionName: "verifiedStudents", args: [address!] },
+      { ...contractConfig, functionName: "totalCourseEvaluations" },
+      { ...contractConfig, functionName: "totalProposals" },
     ],
   });
 
   const [professorAddress, setProfessorAddress] = useState<eth_address>();
   const [tokensAmount, setTokensAmount] = useState<number>(0);
   const [verifiedStudent, setVerifiedStudent] = useState<boolean>(false);
+  const [totalCourseEvaluations, setTotalCourseEvaluations] =
+    useState<number>(0);
+  const [totalProposals, setTotalProposals] = useState<number>(0);
 
   useEffect(() => {
     if (!data) return;
     setProfessorAddress(data[0].result);
-    setTokensAmount(Number(data[1].result));
+    setTokensAmount(Number(data[1].result) || 0);
     setVerifiedStudent(data[2]?.result ?? false);
-
-    console.log("globals", { professorAddress, tokensAmount, verifiedStudent });
+    setTotalCourseEvaluations(Number(data[3].result) || 0);
+    setTotalProposals(Number(data[4].result) || 0);
   }, [data]);
+
+  console.log("globals", {
+    professorAddress,
+    tokensAmount,
+    verifiedStudent,
+    totalCourseEvaluations,
+    totalProposals,
+  });
 
   return (
     <div className={"grid row-span-full gap-3"}>
@@ -60,7 +73,13 @@ export default function Home() {
           <h1 className={"text-white text-2xl"}>
             Professor Improvement Proposals (PIPs)
           </h1>
-          <Proposals address={address} professorAddress={professorAddress} />
+          <Proposals
+            address={address}
+            professorAddress={professorAddress}
+            tokens={tokensAmount}
+            refetch={() => refetch()}
+            totalProposals={totalProposals}
+          />
         </div>
       </div>
       <div className={"p-5 bg-slate-800 rounded-2xl"}>
@@ -73,6 +92,7 @@ export default function Home() {
           <Evaluations
             verifiedStudent={verifiedStudent}
             refetch={() => refetch()}
+            totalCourseEvaluations={totalCourseEvaluations}
           />
         </div>
       </div>

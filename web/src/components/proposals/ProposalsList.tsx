@@ -1,5 +1,3 @@
-"use client";
-
 import { useWriteContract } from "wagmi";
 import {
   Table,
@@ -28,19 +26,14 @@ import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 
 export function ProposalsList({
   proposals,
+  refetch,
 }: {
   proposals: InfiniteQueryObserverResult;
+  refetch: () => void;
 }) {
   // TODO: https://wagmi.sh/react/api/hooks/useInfiniteReadContracts
 
   const { data: txnhash, writeContractAsync } = useWriteContract();
-
-  // const { data: totalProposals } = useReadContract({
-  //   ...contractConfig,
-  //   functionName: "totalProposals",
-  // });
-
-  if (proposals.isLoading) return <>Loading...</>;
 
   function onClick({
     index,
@@ -56,10 +49,12 @@ export function ProposalsList({
       functionName: "voteProposal",
       args: [BigInt(index), BigInt(amount), vote],
     }).then(() => {
-      proposals.refetch();
       toast({
         title: `You have voted ${vote ? "FOR" : "AGAINST"} proposal #${index}`,
       });
+
+      refetch();
+      proposals.refetch();
     });
   }
 

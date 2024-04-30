@@ -21,6 +21,8 @@ import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { contractConfig } from "@/lib/wagmiConfig";
 import { InfiniteQueryObserverResult } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const FormSchema = z.object({
   feedback: z.string().min(8),
@@ -62,7 +64,10 @@ export function SubmitEvaluation({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-2/3 space-y-6 grid row-span-2 justify-center"
+      >
         <FormField
           control={form.control}
           name="feedback"
@@ -70,7 +75,7 @@ export function SubmitEvaluation({
             <FormItem>
               <FormLabel>Feedback</FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   className="text-black"
                   placeholder="Add feedback"
                   {...field}
@@ -85,7 +90,14 @@ export function SubmitEvaluation({
           )}
         />
         <Button type="submit" disabled={loading}>
-          {loading ? <Skeleton>Submit</Skeleton> : "Submit"}
+          {loading ? (
+            <div className={"inline-flex gap-1 items-center"}>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </div>
+          ) : (
+            "Submit"
+          )}
         </Button>
         {hash && <div>Transaction Hash: {hash}</div>}
       </form>

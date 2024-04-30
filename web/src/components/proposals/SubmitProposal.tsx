@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,12 +14,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { classdaoAbi } from "@/lib/abi/CLASSDAO.abi";
 import { useWriteContract } from "wagmi";
 import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 import { contractConfig } from "@/lib/wagmiConfig";
+import { Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const FormSchema = z.object({
   title: z.string().min(8),
@@ -30,8 +28,12 @@ const FormSchema = z.object({
 
 export function SubmitProposal({
   proposals,
+  hasEnoughTokens,
+  refetch,
 }: {
   proposals: InfiniteQueryObserverResult;
+  hasEnoughTokens: boolean;
+  refetch: () => void;
 }) {
   // TODO: https://wagmi.sh/react/guides/write-to-contract
   const { data: hash, writeContractAsync } = useWriteContract();
@@ -59,6 +61,7 @@ export function SubmitProposal({
 
       setLoading(false);
       proposals.refetch();
+      refetch();
       form.reset();
     });
   }
@@ -79,9 +82,7 @@ export function SubmitProposal({
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
-                A description of what you want this proposal to achieve.
-              </FormDescription>
+              <FormDescription>A title for your proposal.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -93,7 +94,7 @@ export function SubmitProposal({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   className="text-black"
                   placeholder="Add a description"
                   {...field}
@@ -106,9 +107,23 @@ export function SubmitProposal({
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={loading}>
-          {loading ? <Skeleton>Submit</Skeleton> : "Submit"}
+        <Button
+          type="submit"
+          disabled={loading || !hasEnoughTokens}
+          className={"w-full"}
+        >
+          {loading ? (
+            <div>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </div>
+          ) : (
+            "Submit"
+          )}
         </Button>
+        {!hasEnoughTokens && (
+          <div>You do not have enough tokens! 10 $CLK per proposal.</div>
+        )}
         {hash && <div>Transaction Hash: {hash}</div>}
       </form>
     </Form>

@@ -5,13 +5,21 @@ import { contractConfig } from "@/lib/wagmiConfig";
 import { SubmitProposal } from "@/components/proposals/SubmitProposal";
 import { ProposalsList } from "@/components/proposals/ProposalsList";
 import { eth_address } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LoadMorePagesButton } from "@/components/LoadMorePagesButton";
 
 export function Proposals({
   address,
   professorAddress,
+  tokens,
+  refetch,
+  totalProposals,
 }: {
   address: eth_address;
   professorAddress: eth_address;
+  tokens: number;
+  refetch: () => void;
+  totalProposals: number;
 }) {
   const proposalsPerPage = 5;
 
@@ -35,13 +43,23 @@ export function Proposals({
     },
   });
 
-  if (proposals.isLoading) return <>Loading...</>;
+  if (proposals.isLoading) return <Skeleton className={"h-[250px] w-full"} />;
+
+  console.log("proposals", { proposals });
 
   return (
     <>
-      <ProposalsList proposals={proposals} />
+      <ProposalsList proposals={proposals} refetch={() => refetch()} />
+      <LoadMorePagesButton
+        infiniteQueryResult={proposals}
+        totalResults={totalProposals}
+      />
       {address && professorAddress && address !== professorAddress && (
-        <SubmitProposal proposals={proposals} />
+        <SubmitProposal
+          proposals={proposals}
+          hasEnoughTokens={tokens > 0}
+          refetch={() => refetch()}
+        />
       )}
     </>
   );

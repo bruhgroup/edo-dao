@@ -133,6 +133,13 @@ contract CLASSDAO is CLASSKEN {
     }
 
     /**
+     * totalCourseEvaluations returns the total number of course evaluations submitted.
+     */
+    function totalCourseEvaluations() public view returns (uint256) {
+        return evaluations.length;
+    }
+
+    /**
      * This submits a course evaluation for the class, given that they are verified student and not the professor.
      */
     function submitCourseEvaluation(string memory feedback) public notProfessor onlyStudents {

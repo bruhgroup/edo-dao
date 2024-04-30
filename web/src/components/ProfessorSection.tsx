@@ -19,6 +19,8 @@ import { toast } from "@/components/ui/use-toast";
 import { contractConfig } from "@/lib/wagmiConfig";
 import type { eth_address } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const FormSchema = z.object({
   student: z.string().startsWith("0x").min(8),
@@ -32,7 +34,9 @@ export function ProfessorSection({
   address: eth_address;
   professorAddress: eth_address;
 }) {
-  const { data: hash, writeContract } = useWriteContract();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const { data: hash, writeContractAsync } = useWriteContract();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -42,18 +46,19 @@ export function ProfessorSection({
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: `Awarded student with ${data.amount} tokens.`,
-      description: `Student: ${data.student}`,
-    });
-
-    writeContract({
+    setLoading(true);
+    writeContractAsync({
       ...contractConfig,
       functionName: "awardTokens",
       args: [data.student, BigInt(data.amount)],
+    }).then(() => {
+      toast({
+        title: `Awarded student with ${data.amount} tokens.`,
+        description: `Student: ${data.student}`,
+      });
+      setLoading(false);
+      form.reset();
     });
-
-    form.reset();
   }
 
   if (address == professorAddress) {
@@ -65,7 +70,7 @@ export function ProfessorSection({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className={"w-2/3 space-y-6"}
+            className="w-2/3 space-y-6"
           >
             <FormField
               control={form.control}
@@ -81,7 +86,7 @@ export function ProfessorSection({
                     />
                   </FormControl>
                   <FormDescription>
-                    Address of student to award CLASSKEN to.
+                    Address of student to award $CLK to.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -103,13 +108,22 @@ export function ProfessorSection({
                     />
                   </FormControl>
                   <FormDescription>
-                    Amount of CLASSKEN to award student.
+                    Amount of $CLK to award student.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={loading} className={"w-full"}>
+              {loading ? (
+                <div className={"inline-flex gap-1 items-center"}>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </div>
+              ) : (
+                "Submit"
+              )}
+            </Button>
             {hash && <div>Transaction Hash: {hash}</div>}
           </form>
         </Form>

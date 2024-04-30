@@ -4,13 +4,17 @@ import { EvaluationsList } from "@/components/evaluations/EvaluationsList";
 import { StudentValidation } from "@/components/StudentValidation";
 import { SubmitEvaluation } from "@/components/evaluations/SubmitEvaluation";
 import { BadgeCheckIcon, BadgeXIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LoadMorePagesButton } from "@/components/LoadMorePagesButton";
 
 export function Evaluations({
   verifiedStudent,
   refetch,
+  totalCourseEvaluations,
 }: {
   verifiedStudent: boolean;
   refetch: () => void;
+  totalCourseEvaluations: number;
 }) {
   const evaluationsPerPage = 5;
 
@@ -34,7 +38,7 @@ export function Evaluations({
     },
   });
 
-  if (evaluations.isLoading) return <>Loading...</>;
+  if (evaluations.isLoading) return <Skeleton className={"h-[250px] w-full"} />;
 
   console.log("evaluations", { verifiedStudent, evaluations });
 
@@ -49,6 +53,10 @@ export function Evaluations({
         )}
       </span>
       <EvaluationsList evaluations={evaluations} />
+      <LoadMorePagesButton
+        infiniteQueryResult={evaluations}
+        totalResults={totalCourseEvaluations}
+      />
       {verifiedStudent ? (
         <SubmitEvaluation evaluations={evaluations} />
       ) : (
