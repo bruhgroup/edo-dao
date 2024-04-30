@@ -9,6 +9,7 @@ export function LoadMorePagesButton({
   infiniteQueryResult: InfiniteQueryObserverResult;
   totalResults: number;
 }) {
+  // @ts-ignore
   const numLoadedPages = Math.max(...infiniteQueryResult?.data?.pageParams) + 5;
 
   return (
