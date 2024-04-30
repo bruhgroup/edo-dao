@@ -3,9 +3,10 @@ import { groth16 } from "snarkjs";
 export async function generateZkProof(input: string[]) {
   const inputs = {
     in: input,
+    hash: process.env.NEXT_PUBLIC_ZK_HASH!,
   };
 
-  console.log({ inputs });
+  console.log("zkproof", { inputs });
 
   const wasmFile = "proof/isstudent.wasm";
   const zkeyFile = "proof/isstudent_final.zkey";
@@ -17,7 +18,7 @@ export async function generateZkProof(input: string[]) {
       zkeyFile,
     );
 
-    console.log({ proof, publicSignals });
+    console.log("zkproof", { proof, publicSignals });
 
     const calldataBlob = await groth16.exportSolidityCallData(
       proof,
@@ -25,7 +26,7 @@ export async function generateZkProof(input: string[]) {
     );
     const calldata = JSON.parse(`[${calldataBlob}]`);
 
-    console.log({ calldata });
+    console.log("zkproof", { calldata });
 
     return {
       a: calldata[0],
@@ -34,7 +35,7 @@ export async function generateZkProof(input: string[]) {
       publicSignals: calldata[3],
     };
   } catch (err) {
-    console.log(err);
+    console.log("zkproof", err);
     return null;
   }
 }

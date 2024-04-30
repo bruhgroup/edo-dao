@@ -42,14 +42,14 @@ contract Groth16Verifier {
     uint256 constant deltay1 = 15863524832558186015470202593545510265717174397030560594731310820478913366307;
     uint256 constant deltay2 = 18616507688970465064921116556923183808949426144954816257236873217559781249595;
 
-
+    
     uint256 constant IC0x = 15321926361609503057450663344741868899066230872301403541444880389853386847355;
     uint256 constant IC0y = 18898960113609295288733838088109074098792561666789664333574345074522499077614;
-
+    
     uint256 constant IC1x = 12465593358661378941860324229160149192067390576010021527162179198747643226501;
     uint256 constant IC1y = 11549491675809340505491287317081297877977056528504705393133553924044444314959;
-
-
+    
+ 
     // Memory data
     uint16 constant pVk = 0;
     uint16 constant pPairing = 128;
@@ -64,8 +64,8 @@ contract Groth16Verifier {
                     return(0, 0x20)
                 }
             }
-
-        // G1 function to multiply a G1 value(x,y) to value in an address
+            
+            // G1 function to multiply a G1 value(x,y) to value in an address
             function g1_mulAccC(pR, x, y, s) {
                 let success
                 let mIn := mload(0x40)
@@ -98,47 +98,47 @@ contract Groth16Verifier {
                 mstore(_pVk, IC0x)
                 mstore(add(_pVk, 32), IC0y)
 
-            // Compute the linear combination vk_x
-
+                // Compute the linear combination vk_x
+                
                 g1_mulAccC(_pVk, IC1x, IC1y, calldataload(add(pubSignals, 0)))
+                
 
-
-            // -A
+                // -A
                 mstore(_pPairing, calldataload(pA))
                 mstore(add(_pPairing, 32), mod(sub(q, calldataload(add(pA, 32))), q))
 
-            // B
+                // B
                 mstore(add(_pPairing, 64), calldataload(pB))
                 mstore(add(_pPairing, 96), calldataload(add(pB, 32)))
                 mstore(add(_pPairing, 128), calldataload(add(pB, 64)))
                 mstore(add(_pPairing, 160), calldataload(add(pB, 96)))
 
-            // alpha1
+                // alpha1
                 mstore(add(_pPairing, 192), alphax)
                 mstore(add(_pPairing, 224), alphay)
 
-            // beta2
+                // beta2
                 mstore(add(_pPairing, 256), betax1)
                 mstore(add(_pPairing, 288), betax2)
                 mstore(add(_pPairing, 320), betay1)
                 mstore(add(_pPairing, 352), betay2)
 
-            // vk_x
+                // vk_x
                 mstore(add(_pPairing, 384), mload(add(pMem, pVk)))
                 mstore(add(_pPairing, 416), mload(add(pMem, add(pVk, 32))))
 
 
-            // gamma2
+                // gamma2
                 mstore(add(_pPairing, 448), gammax1)
                 mstore(add(_pPairing, 480), gammax2)
                 mstore(add(_pPairing, 512), gammay1)
                 mstore(add(_pPairing, 544), gammay2)
 
-            // C
+                // C
                 mstore(add(_pPairing, 576), calldataload(pC))
                 mstore(add(_pPairing, 608), calldataload(add(pC, 32)))
 
-            // delta2
+                // delta2
                 mstore(add(_pPairing, 640), deltax1)
                 mstore(add(_pPairing, 672), deltax2)
                 mstore(add(_pPairing, 704), deltay1)
@@ -153,18 +153,18 @@ contract Groth16Verifier {
             let pMem := mload(0x40)
             mstore(0x40, add(pMem, pLastMem))
 
-        // Validate that all evaluations ∈ F
-
+            // Validate that all evaluations ∈ F
+            
             checkField(calldataload(add(_pubSignals, 0)))
-
+            
             checkField(calldataload(add(_pubSignals, 32)))
+            
 
-
-        // Validate all evaluations
+            // Validate all evaluations
             let isValid := checkPairing(_pA, _pB, _pC, _pubSignals, pMem)
 
             mstore(0, isValid)
-            return(0, 0x20)
-        }
-    }
-}
+             return(0, 0x20)
+         }
+     }
+ }

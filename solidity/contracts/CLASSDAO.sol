@@ -118,7 +118,7 @@ contract CLASSDAO is CLASSKEN {
     /**
      * This verifies a student, and verifies the calldata if student has not yet been verified.
      */
-    function verifyStudent(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[5] calldata _pubSignals) public notProfessor returns (bool) {
+    function verifyStudent(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[1] calldata _pubSignals) public notProfessor returns (bool) {
         // Sender not yet verified (all are false by default)
         if (!verifiedStudents[msg.sender]) {
             bool result = verifier.verifyProof(_pA, _pB, _pC, _pubSignals);

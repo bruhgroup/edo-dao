@@ -26,7 +26,7 @@ import {
 import { generateZkProof } from "@/lib/generateZkProof";
 
 const FormSchema = z.object({
-  code: z.string().min(12).max(12),
+  code: z.string().min(9).max(9),
 });
 
 export function StudentValidation({
@@ -58,23 +58,21 @@ export function StudentValidation({
         title: "An error occurred while generating proof.",
         description: "Most likely, the proof could not be verified.",
       });
-      setLoading(false);
-      return;
+    } else {
+      writeContractAsync({
+        ...contractConfig,
+        functionName: "verifyStudent",
+        args: [proof.a, proof.b, proof.c, proof.publicSignals],
+      }).then(() => {
+        toast({
+          title: "Verified status as student!",
+        });
+        refetch();
+      });
     }
 
-    writeContractAsync({
-      ...contractConfig,
-      functionName: "verifyStudent",
-      args: [proof.a, proof.b, proof.c, proof.publicSignals],
-    }).then(() => {
-      toast({
-        title: "Verified",
-      });
-
-      setLoading(false);
-      refetch();
-      form.reset();
-    });
+    setLoading(false);
+    form.reset();
   }
 
   return (
@@ -87,7 +85,7 @@ export function StudentValidation({
             <FormItem>
               <FormLabel>Student Verification Code</FormLabel>
               <FormControl>
-                <InputOTP maxLength={12} {...field}>
+                <InputOTP maxLength={9} {...field}>
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
@@ -105,12 +103,6 @@ export function StudentValidation({
                     <InputOTPSlot index={7} />
                     <InputOTPSlot index={8} />
                   </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={9} />
-                    <InputOTPSlot index={10} />
-                    <InputOTPSlot index={11} />
-                  </InputOTPGroup>
                 </InputOTP>
               </FormControl>
               <FormDescription>
@@ -124,7 +116,7 @@ export function StudentValidation({
         <Button type="submit" disabled={loading}>
           {loading ? <Skeleton>Submit</Skeleton> : "Submit"}
         </Button>
-        {hash && <div>Transaction Hash: {hash}</div>}{" "}
+        {hash && <div>Transaction Hash: {hash}</div>}
       </form>
     </Form>
   );
