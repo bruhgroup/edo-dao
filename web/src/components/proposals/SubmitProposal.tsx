@@ -21,6 +21,7 @@ import { useWriteContract } from "wagmi";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InfiniteQueryObserverResult } from "@tanstack/react-query";
+import { contractConfig } from "@/lib/wagmiConfig";
 
 const FormSchema = z.object({
   title: z.string().min(8),
@@ -48,8 +49,7 @@ export function SubmitProposal({
     setLoading(true);
 
     writeContractAsync({
-      address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      abi: classdaoAbi,
+      ...contractConfig,
       functionName: "submitProposal",
       args: [data.title, data.description],
     }).then(() => {

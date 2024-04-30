@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "./CLASSKEN.sol";
 import "./Groth16Verifier.sol";
 
-contract CLASSDAO is CLASSKEN, Groth16Verifier {
+contract CLASSDAO is CLASSKEN {
 
     address public immutable professor;
 
@@ -39,7 +39,7 @@ contract CLASSDAO is CLASSKEN, Groth16Verifier {
      * To make certain methods professor-only
      */
     modifier onlyProfessor() {
-        require(msg.sender == professor);
+        require(msg.sender == professor, "must be professor");
         _;
     }
 
@@ -47,12 +47,12 @@ contract CLASSDAO is CLASSKEN, Groth16Verifier {
      * Professor has no proposal, voting, or vetoing powers, such that the contract can be trusted.
      */
     modifier notProfessor() {
-        require(msg.sender != professor);
+        require(msg.sender != professor, "cannot be professor");
         _;
     }
 
     modifier onlyStudents() {
-        require(verifiedStudents[msg.sender]);
+        require(verifiedStudents[msg.sender], "student status not verified");
         _;
     }
 
@@ -122,6 +122,8 @@ contract CLASSDAO is CLASSKEN, Groth16Verifier {
         // Sender not yet verified (all are false by default)
         if (!verifiedStudents[msg.sender]) {
             bool result = verifier.verifyProof(_pA, _pB, _pC, _pubSignals);
+            require(result, "invalid proof");
+
             verifiedStudents[msg.sender] = result;
 
             emit STUDENT_VERIFIED(msg.sender, result);
@@ -134,7 +136,7 @@ contract CLASSDAO is CLASSKEN, Groth16Verifier {
      * This submits a course evaluation for the class, given that they are verified student and not the professor.
      */
     function submitCourseEvaluation(string memory feedback) public notProfessor onlyStudents {
-        require(bytes(feedback).length > 0);
+        require(bytes(feedback).length > 0, "empty feedback string submitted");
 
         evaluations.push(feedback);
 
