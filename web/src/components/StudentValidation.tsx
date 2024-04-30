@@ -24,6 +24,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { generateZkProof } from "@/lib/generateZkProof";
+import { Loader2 } from "lucide-react";
 
 const FormSchema = z.object({
   code: z.string().min(9).max(9),
@@ -116,8 +117,15 @@ export function StudentValidation({
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={loading}>
-          {loading ? <Skeleton>Submit</Skeleton> : "Submit"}
+        <Button type="submit" disabled={loading} className={"w-full"}>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </>
+          ) : (
+            "Submit"
+          )}
         </Button>
         {hash && <div>Transaction Hash: {hash}</div>}
       </form>

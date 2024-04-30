@@ -113,10 +113,10 @@ export function SubmitProposal({
           className={"w-full"}
         >
           {loading ? (
-            <div>
+            <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Please wait
-            </div>
+            </>
           ) : (
             "Submit"
           )}

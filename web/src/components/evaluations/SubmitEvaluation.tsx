@@ -91,10 +91,10 @@ export function SubmitEvaluation({
         />
         <Button type="submit" disabled={loading}>
           {loading ? (
-            <div className={"inline-flex gap-1 items-center"}>
+            <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Please wait
-            </div>
+            </>
           ) : (
             "Submit"
           )}
