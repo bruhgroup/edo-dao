@@ -9,9 +9,9 @@ export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 if (!projectId) throw new Error("Project ID is not defined");
 
 const metadata = {
-  name: "Web3Modal",
+  name: "class-dao",
   description: "Web3Modal Example",
-  url: "http://localhost:3000", // origin must match your domain & subdomain
+  url: "https://edo-dao.vercel.app/", // origin must match your domain & subdomain
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
@@ -19,7 +19,9 @@ const chains = [sepolia, localhost] as const;
 export const wagmiConfig = defaultWagmiConfig({
   chains,
   transports: {
-    [sepolia.id]: http(),
+    [sepolia.id]: http(
+      `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
+    ),
     [localhost.id]: http(),
   },
   projectId,
