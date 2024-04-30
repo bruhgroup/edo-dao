@@ -30,7 +30,7 @@ export function EvaluationsList({
           .filter((p: Record<string, any>) => p.status == "success")
           .map((p: Record<string, any>, pi: number) => (
             <TableRow key={pi}>
-              <TableCell key={hash(pi + "desc")}>{p.result[0]}</TableCell>
+              <TableCell key={hash(pi + "desc")}>{p.result}</TableCell>
             </TableRow>
           ))}
       </TableBody>

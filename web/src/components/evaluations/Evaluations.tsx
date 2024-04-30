@@ -2,6 +2,8 @@ import { useInfiniteReadContracts } from "wagmi";
 import { contractConfig } from "@/lib/wagmiConfig";
 import { EvaluationsList } from "@/components/evaluations/EvaluationsList";
 import { StudentValidation } from "@/components/StudentValidation";
+import { SubmitEvaluation } from "@/components/evaluations/SubmitEvaluation";
+import { BadgeCheckIcon, BadgeXIcon } from "lucide-react";
 
 export function Evaluations({
   verifiedStudent,
@@ -34,13 +36,22 @@ export function Evaluations({
 
   if (evaluations.isLoading) return <>Loading...</>;
 
-  console.log({ verifiedStudent });
+  console.log("evaluations", { verifiedStudent, evaluations });
 
   return (
     <>
-      <p>Verified? {String(verifiedStudent)}</p>
+      <span className={"inline-flex gap-2"}>
+        Verified Student{" "}
+        {verifiedStudent ? (
+          <BadgeCheckIcon color={"lightgreen"} />
+        ) : (
+          <BadgeXIcon color={"tomato"} />
+        )}
+      </span>
       <EvaluationsList evaluations={evaluations} />
-      {!verifiedStudent && (
+      {verifiedStudent ? (
+        <SubmitEvaluation evaluations={evaluations} />
+      ) : (
         <StudentValidation status={verifiedStudent} refetch={() => refetch()} />
       )}
     </>

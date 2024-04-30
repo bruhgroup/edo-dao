@@ -29,6 +29,8 @@ export default function Home() {
     setProfessorAddress(data[0].result);
     setTokensAmount(Number(data[1].result));
     setVerifiedStudent(data[2]?.result ?? false);
+
+    console.log("globals", { professorAddress, tokensAmount, verifiedStudent });
   }, [data]);
 
   return (
